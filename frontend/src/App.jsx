@@ -42,14 +42,15 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // คัดเลือกเฉพาะฟิลด์ที่ Backend ต้องการ และตัดค่า null/undefined ออก
+      // ตรวจสอบและคลีนค่า Payload ก่อนส่ง
       const payload = {
-        title: formData.title,
-        publisher: formData.publisher,
+        title: formData.title.trim(),
+        publisher: formData.publisher.trim(),
         category: formData.category,
-        publishedDate: formData.publishedDate,
+        publishedDate:
+          formData.publishedDate || new Date().toISOString().split("T")[0],
         status: formData.status,
-        description: formData.description || "",
+        description: formData.description ? formData.description.trim() : "",
       };
 
       if (editingId) {
@@ -62,13 +63,15 @@ function App() {
       fetchAllJournals();
     } catch (error) {
       console.error("Error saving journal:", error);
+      alert(
+        "เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง",
+      );
     }
   };
 
   const handleEdit = (journal) => {
     setEditingId(journal.id);
 
-    // แปลงวันที่ให้อยู่ในรูปแบบ YYYY-MM-DD เสมอเพื่อป้องกัน Error 500
     let formattedDate = new Date().toISOString().split("T")[0];
     if (journal.publishedDate) {
       const d = new Date(journal.publishedDate);
@@ -115,10 +118,9 @@ function App() {
   return (
     <div className="min-h-screen bg-[#fcfcfc] text-slate-800 font-sans flex flex-col justify-between">
       <div>
-        {/* 1. Top Navigation Bar (Sage Journals Branding + The Papery Logo) */}
+        {/* Top Navigation Bar */}
         <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* The Papery & Sage Journals Branding */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <svg
@@ -142,7 +144,6 @@ function App() {
               </span>
             </div>
 
-            {/* Main Header Search Bar */}
             <div className="flex items-center gap-4 w-full md:w-auto">
               <div className="relative flex-1 md:w-80">
                 <input
@@ -165,7 +166,6 @@ function App() {
             </div>
           </div>
 
-          {/* Sub-navigation Menu */}
           <div className="border-t border-slate-100 bg-slate-50/60 text-xs text-slate-600 px-4 py-1.5">
             <div className="max-w-7xl mx-auto flex gap-6">
               <span className="hover:text-[#002B66] cursor-pointer font-medium">
@@ -178,7 +178,7 @@ function App() {
           </div>
         </header>
 
-        {/* 2. Burgundy Hero Banner */}
+        {/* Burgundy Hero Banner */}
         <section className="bg-[#700028] text-white py-10 px-4 shadow-md">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -195,7 +195,7 @@ function App() {
           </div>
         </section>
 
-        {/* 3. Sub-bar Stats & Quick Links */}
+        {/* Sub-bar Stats */}
         <div className="bg-white border-b border-slate-200 shadow-sm mb-8">
           <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-6 text-xs text-slate-600">
@@ -221,9 +221,8 @@ function App() {
           </div>
         </div>
 
-        {/* 4. Main Body: Grid Content */}
+        {/* Main Body Grid */}
         <main className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
-          {/* Left / Center Column (Form, Filter & Table) */}
           <div className="lg:col-span-3 space-y-8">
             {/* Form Section */}
             <section
@@ -325,7 +324,7 @@ function App() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">
-                    รายละเอียด (Description) *
+                    รายละเอียด (Description)
                   </label>
                   <textarea
                     name="description"
@@ -483,7 +482,7 @@ function App() {
             </section>
           </div>
 
-          {/* Right Sidebar Menu */}
+          {/* Right Sidebar */}
           <aside className="space-y-6">
             <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
               <h3 className="font-serif font-bold text-slate-800 border-b border-slate-100 pb-2 mb-3 text-xs uppercase tracking-wider">
@@ -525,7 +524,7 @@ function App() {
         </main>
       </div>
 
-      {/* 5. Footer Section */}
+      {/* Footer Section */}
       <footer className="bg-[#1e293b] text-slate-300 text-xs py-10 border-t border-slate-800 mt-auto">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
